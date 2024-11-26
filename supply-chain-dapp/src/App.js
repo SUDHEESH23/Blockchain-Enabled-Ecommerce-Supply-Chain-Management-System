@@ -1,87 +1,36 @@
-import React, { useEffect, useState } from "react";
-import Web3 from "web3";
-import { CONTRACT_ABI, CONTRACT_ADDRESS } from "./contractConfig";
+// src/App.js
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Web3Provider } from './contexts/Web3Context';
+import Navbar from './components/Navbar';
+import AddProduct from './components/AddProduct';
+import ProductList from './components/ProductList';
+import UpdateLocation from './components/UpdateLocation';
+import UpdateStatus from './components/UpdateStatus';
+import TransferOwnership from './components/TransferOwnership';
+import MarkDelivered from './components/MarkDelivered';
+import ProductHistory from './components/ProductHistory';
+import Layout from './components/Layout';
 
 function App() {
-    const [account, setAccount] = useState("");
-    const [contract, setContract] = useState(null);
-    const [products, setProducts] = useState([]);
-    const [productName, setProductName] = useState("");
-    const [productPrice, setProductPrice] = useState("");
-
-    useEffect(() => {
-        const initWeb3 = async () => {
-            if (window.ethereum) {
-                const web3 = new Web3(window.ethereum);
-                await window.ethereum.request({ method: "eth_requestAccounts" });
-                const accounts = await web3.eth.getAccounts();
-                setAccount(accounts[0]);
-
-                const supplyChainContract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
-                setContract(supplyChainContract);
-            } else {
-                alert("Please install MetaMask to interact with the blockchain.");
-            }
-        };
-        initWeb3();
-    }, []);
-
-    const addProduct = async () => {
-        if (contract) {
-            await contract.methods
-                .addProduct(productName, Web3.utils.toWei(productPrice, "ether"))
-                .send({ from: account });
-            alert("Product added!");
-            fetchProducts();
-        }
-    };
-
-    const fetchProducts = async () => {
-        if (contract) {
-            const productCount = await contract.methods.productCount().call();
-            const allProducts = [];
-            for (let i = 1; i <= productCount; i++) {
-                const product = await contract.methods.products(i).call();
-                allProducts.push(product);
-            }
-            setProducts(allProducts);
-        }
-    };
-
-    useEffect(() => {
-        fetchProducts();
-    }, [contract]);
-
     return (
-        <div>
-            <h1>Supply Chain DApp</h1>
-            <p>Connected Account: {account}</p>
-
-            <h2>Add Product</h2>
-            <input
-                type="text"
-                placeholder="Product Name"
-                value={productName}
-                onChange={(e) => setProductName(e.target.value)}
-            />
-            <input
-                type="number"
-                placeholder="Product Price (ETH)"
-                value={productPrice}
-                onChange={(e) => setProductPrice(e.target.value)}
-            />
-            <button onClick={addProduct}>Add Product</button>
-
-            <h2>Products</h2>
-            <ul>
-                {products.map((product, index) => (
-                    <li key={index}>
-                        ID: {product.id} | Name: {product.name} | Price:{" "}
-                        {Web3.utils.fromWei(product.price, "ether")} ETH | Owner: {product.owner}
-                    </li>
-                ))}
-            </ul>
-        </div>
+        <Router>
+            <Web3Provider>
+                <Layout>
+                    <Navbar /> {/* Place Navbar at the top */}
+                    <Routes>
+                        {/* Define routes for each component */}
+                        <Route path="/add-product" element={<AddProduct />} />
+                        <Route path="/products" element={<ProductList />} />
+                        <Route path="/update-location" element={<UpdateLocation />} />
+                        <Route path="/update-status" element={<UpdateStatus />} />
+                        <Route path="/transfer-ownership" element={<TransferOwnership />} />
+                        <Route path="/mark-delivered" element={<MarkDelivered />} />
+                        <Route path="/product-history" element={<ProductHistory />} />
+                    </Routes>
+                </Layout>
+            </Web3Provider>
+        </Router>
     );
 }
 
