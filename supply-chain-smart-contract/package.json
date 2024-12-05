@@ -1,7 +1,6 @@
 {
   "name": "supply-chain-smart-contract",
   "version": "1.0.0",
-  "description": "",
   "main": "truffle-config.js",
   "directories": {
     "test": "test"
@@ -13,9 +12,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@openzeppelin/contracts": "^4.7.0",
+    "@openzeppelin/contracts": "^4.9.6",
     "dotenv": "^16.4.5",
     "solc": "^0.8.20",
     "web3": "^4.15.0"
+  },
+  "description": "",
+  "devDependencies": {
+    "truffle": "^5.4.0"
   }
 }
